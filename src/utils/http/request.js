@@ -2,7 +2,8 @@ import axios from 'axios'
 import {ElMessage, ElMessageBox} from "element-plus";
 // 请求
 const http = axios.create({
-  baseURL: 'http://127.0.0.1:5000/api',
+  // baseURL: 'http://127.0.0.1:5000/api',
+  baseURL: 'http://192.168.50.153:5000/api',
   timeout: 5000,
 });
 // 请求拦截
@@ -26,7 +27,6 @@ http.interceptors.response.use(
   (res) => {
     // 对响应码的处理
     if (res && res.status) {
-      console.log('status: ', res.status)
       switch (res.status) {
         case 200:
           showMessage("success", res.data);

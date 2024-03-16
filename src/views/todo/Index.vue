@@ -11,15 +11,14 @@
       </template>
     </el-input>
 
-    <el-divider />
-
-    <div style="margin-bottom: 16px; color: #409eff">
+    <div style="margin: 12px 0; color: #409eff">
       共{{ list.length }}个任务，已完成{{ list.filter(v => v['is_done']).length }}个
     </div>
 
     <div @dblclick="on_dblclick(v['id'])" class="item" v-for="(v, i) in list" :key="v.id">
       <div v-if="active_item_id === v['id']">
         <el-input
+          ref="input_ref"
           v-model="v['content']"
           style="width: 500px; margin-top: 9px;"
           @keyup.enter="update_todo(v, true)"
@@ -34,12 +33,7 @@
         </span>
         <div :class="v['is_done'] ? 'line-through' : ''">{{ v['content'] }}</div>
         <div class="create-time">
-          {{
-            new Date(v['create_time'].slice(0, v['create_time'].length - 3)).toLocaleDateString()
-          }}
-          {{
-            new Date(v['create_time'].slice(0, v['create_time'].length - 3)).toLocaleTimeString()
-          }}
+          {{ format_time(v['create_time']) }}
         </div>
         <span class="delete-button">
           <el-button type="danger" plain size="small" @click="del_todo(v['id'])">删除</el-button>
@@ -51,8 +45,9 @@
 
 <script>
 import { todo_list, todo_add, todo_update, todo_delete } from '@/apis/todo'
-import { onMounted, ref } from 'vue'
+import { nextTick, onMounted, ref } from 'vue'
 import { ElMessage } from 'element-plus'
+import { format_time } from '@/utils/time/format'
 
 export default {
   name: 'Index',
@@ -60,6 +55,7 @@ export default {
     const todo_input = ref('')
 
     const list = ref([])
+    const input_ref = ref()
 
     const get_todo_list = () => {
       todo_list().then(res => {
@@ -105,10 +101,18 @@ export default {
           is_done: item['is_done']
         }).then(() => {
           active_item_id.value = id
+
+          nextTick(() => {
+            input_ref.value[0].focus()
+          })
         })
 
       } else {
         active_item_id.value = id
+
+        nextTick(() => {
+          input_ref.value[0].focus()
+        })
       }
     }
 
@@ -141,6 +145,8 @@ export default {
       active_item_id,
       update_todo,
       del_todo,
+      format_time,
+      input_ref
     }
   }
 }
@@ -201,7 +207,7 @@ export default {
 
   .line-through {
     text-decoration: line-through;
-    text-decoration-color: #aaa;
+    text-decoration-color: #409eff;
     color: #aaa;
   }
 </style>

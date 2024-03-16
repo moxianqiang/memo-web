@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import { onMounted, reactive, toRefs } from 'vue'
+import { reactive, toRefs } from 'vue'
 import { useRouter } from 'vue-router'
 import { login } from '@/apis/login.js'
 
@@ -62,10 +62,6 @@ export default {
         router.replace('/home')
       })
     }
-
-    onMounted(() => {
-      console.log('login.vue')
-    })
 
     return {
       ...toRefs(form_state),

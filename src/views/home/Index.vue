@@ -1,9 +1,27 @@
 <template>
   <div class="home-wrapper">
+    <!--  v-if="is_show_modal"  -->
+    <DogIndex v-model:showModal="is_show_modal" />
+
     <div class="header">
       <span class="title">
-        欢迎使用备忘录
+        <span>欢迎使用备忘录</span>
+
         <img src="https://www.ricocc.com/todo/img/todo.svg" alt="头图">
+
+        <el-button
+          type="primary"
+          plain
+          size="small"
+          @click="is_show_modal=true"
+        >图片</el-button>
+
+        <el-button
+          type="primary"
+          plain
+          size="small"
+          @click="open_weather_modal"
+        >天气</el-button>
       </span>
 
       <el-dropdown trigger="click">
@@ -38,14 +56,19 @@ import { ref } from 'vue'
 import Todo from '@/views/todo/Index.vue'
 import Article from '@/views/article/Index.vue'
 import { useRouter } from 'vue-router'
+import { weather_modal } from '@/components/modal/weather'
+import DogIndex from '@/components/modal/dog/Index.vue'
 
 export default {
   name: 'Index',
   components: {
     Todo,
-    Article
+    Article,
+    DogIndex
   },
   setup () {
+    const is_show_modal = ref(false)
+
     const active_name = ref('article')
 
     const handle_click = () => {
@@ -64,12 +87,27 @@ export default {
       })
     }
 
+    function open_weather_modal() {
+      weather_modal({
+        title: '未来一周天气',
+        // city: '佛山市',
+        cancel: () => {
+          console.log('取消..')
+        },
+        confirm: () => {
+          console.log('确定..')
+        }
+      })
+    }
+
     return {
       active_name,
       handle_click,
       article_ref,
       todo_ref,
-      on_logout
+      on_logout,
+      is_show_modal,
+      open_weather_modal
     }
   }
 }
@@ -98,7 +136,7 @@ export default {
 
       img {
         height: 24px;
-        margin-left: 20px;
+        margin: 0 20px;
       }
     }
   }

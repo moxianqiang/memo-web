@@ -1,6 +1,12 @@
 <template>
   <div class="article-wrapper">
     <div class="header">
+      <el-input
+        clearable
+        v-model="input_search"
+        style="width: 240px"
+        placeholder="搜索..."
+      />
       <el-button type="primary" @click="open_dialog">发表笔记</el-button>
     </div>
 
@@ -19,15 +25,7 @@
             </template>
           </el-popconfirm>
 
-          <span>
-          发表时间：
-          {{
-            new Date(v['create_time'].slice(0, v['create_time'].length - 3)).toLocaleDateString()
-          }}
-          {{
-            new Date(v['create_time'].slice(0, v['create_time'].length - 3)).toLocaleTimeString()
-          }}
-        </span>
+          <span>发表时间：{{ format_time(v['create_time']) }}</span>
         </div>
       </div>
       <div class="content">{{ v['content'] }}</div>
@@ -100,9 +98,12 @@
 </template>
 
 <script>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { article_add, article_list, article_delete, article_update } from '@/apis/article'
 import { ElMessage } from '_element-plus@2.6.0@element-plus'
+import { format_time } from '@/utils/time/format'
+import useInputSearch from '@/hooks/useInputSearch'
+import { useIndexStore } from '@/store/index.js'
 
 export default {
   name: 'Index',
@@ -179,6 +180,17 @@ export default {
       })
     }
 
+    let input_search = useInputSearch('', 1000)
+
+    const store = useIndexStore()
+    store.$subscribe(() => {
+      article_list({
+        search: input_search.value
+      }).then(res => {
+        list.value = res.data
+      })
+    })
+
     return {
       title,
       content,
@@ -190,7 +202,9 @@ export default {
       detail_dialog_visible,
       open_detail,
       detail,
-      on_edit
+      on_edit,
+      format_time,
+      input_search,
     }
   }
 }
@@ -200,7 +214,9 @@ export default {
   .article-wrapper {
 
     .header {
-      text-align: right;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       height: 40px;
     }
   }
@@ -208,7 +224,6 @@ export default {
   .item {
     box-sizing: border-box;
     padding: 10px 10px 10px 30px;
-    border-bottom: 1px dashed #e0e0e0;
 
     .title {
       position: relative;
